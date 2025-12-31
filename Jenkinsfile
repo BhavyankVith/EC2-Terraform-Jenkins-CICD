@@ -42,7 +42,7 @@ pipeline {
 stage('Deploy App on EC2') {
     steps {
         // Use both SSH and Docker credentials
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sshagent(['ec2-ssh-key']) {
                 sh '''
                 ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
