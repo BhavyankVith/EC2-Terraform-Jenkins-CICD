@@ -31,6 +31,14 @@ pipeline {
         }
       }
     }
+// To check whether SSH-agent is working fine or not
+stage('SSH Test') {
+  steps {
+    sshagent(credentials: ['ec2-ssh-key']) {
+      sh 'ssh -v ec2-user@EC2_IP "hostname"'
+    }
+  }
+}
 
     stage('Provision Infrastructure') {
       steps {
