@@ -49,33 +49,29 @@ stage('SSH Test') {
   }
 }
 stage('Deploy App on EC2') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-            // Ensure 'ec2-ssh-key-v2' is a "SSH Username with private key" credential type
-            sshagent(['ec2-ssh-key-v2']) {
-                sh """
-                sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'hostname'"
-                    # We use << 'EOF' to prevent local shell expansion of remote commands
-                    
-                    # Log in to Docker Hub
-                    echo "${DOCKER_PASS}" | sudo docker login -u "${DOCKER_USER}" --password-stdin
-
-                    # Pull latest image
-                    sudo docker pull ${IMAGE_NAME}:latest
-
-                    # Stop and cleanup
-                    sudo docker stop devops-app || true
-                    sudo docker rm devops-app || true
-
-                    # Run new container
-                    sudo docker run -d --name devops-app -p 5000:5000 ${IMAGE_NAME}:latest
+  steps {
+    withCredentials([
+      usernamePassword(
+        credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0',
+        usernameVariable: 'DOCKER_USER',
+        passwordVariable: 'DOCKER_PASS'
+      )
+    ]) {
+      sshagent(['ec2-ssh-key-v2']) {
+        sh """
+        ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} << EOF
+          echo '${DOCKER_PASS}' | sudo docker login -u '${DOCKER_USER}' --password-stdin
+          sudo docker pull ${IMAGE_NAME}:latest
+          sudo docker stop devops-app || true
+          sudo docker rm devops-app || true
+          sudo docker run -d --name devops-app -p 5000:5000 ${IMAGE_NAME}:latest
 EOF
-                """
-            }
-        }
+        """
+      }
     }
   }
- }
+}
+}
 }
 
 
