@@ -59,6 +59,7 @@ stage('Deploy App on EC2') {
     ]) {
       sshagent(['ec2-ssh-key-v2']) {
         sh """
+        ssh ec2-user@${EC2_HOST} 'docker ps'
         ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} << EOF
           echo '${DOCKER_PASS}' | sudo docker login -u '${DOCKER_USER}' --password-stdin
           sudo docker pull ${IMAGE_NAME}:latest
