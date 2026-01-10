@@ -31,13 +31,7 @@ pipeline {
         }
       }
     }
-// To check whether SSH-agent is working fine or not
-stage('SSH Test') {
-  steps {
-    sshagent(credentials: ['ec2-ssh-key']) {
-      sh 'ssh -v ec2-user@EC2_IP "hostname"'
-    }
-  }
+
 }
 
     stage('Provision Infrastructure') {
@@ -46,6 +40,14 @@ stage('SSH Test') {
         sh 'terraform apply -auto-approve'
       }
     }
+
+// To check whether SSH-agent is working fine or not
+stage('SSH Test') {
+  steps {
+    sshagent(credentials: ['ec2-ssh-key']) {
+      sh 'ssh -v ec2-user@EC2_IP "hostname"'
+    }
+  }
 stage('Deploy App on EC2') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
