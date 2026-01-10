@@ -42,8 +42,9 @@ pipeline {
 // To check whether SSH-agent is working fine or not
 stage('SSH Test') {
   steps {
-    sshagent(credentials: ['ec2-ssh-key']) {
-      sh 'ssh -v ec2-user@EC2_IP "hostname"'
+    sshagent(credentials: ['ec2-ssh-key-v2']) {
+      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'hostname'"
+      //sh 'ssh -v ec2-user@EC2_IP "hostname"'
     }
   }
 }
@@ -53,7 +54,7 @@ stage('Deploy App on EC2') {
             // Ensure 'ec2-ssh-key-v2' is a "SSH Username with private key" credential type
             sshagent(['ec2-ssh-key-v2']) {
                 sh """
-                ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+                sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'hostname'"
                     # We use << 'EOF' to prevent local shell expansion of remote commands
                     
                     # Log in to Docker Hub
