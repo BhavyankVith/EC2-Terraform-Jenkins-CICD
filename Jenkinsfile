@@ -38,34 +38,34 @@ pipeline {
         sh 'terraform apply -auto-approve'
       }
     }
-
 stage('Deploy App on EC2') {
     steps {
-        // Use both SSH and Docker credentials
         withCredentials([usernamePassword(credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            // Ensure 'ec2-ssh-key-v2' is a "SSH Username with private key" credential type
             sshagent(['ec2-ssh-key-v2']) {
-                sh '''
-                ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
-                    # Log in to Docker Hub on the EC2 instance
-                    echo ${DOCKER_PASS} | sudo docker login -u ${DOCKER_USER} --password-stdin
+                sh """
+                ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+                    # We use << 'EOF' to prevent local shell expansion of remote commands
+                    
+                    # Log in to Docker Hub
+                    echo "${DOCKER_PASS}" | sudo docker login -u "${DOCKER_USER}" --password-stdin
 
                     # Pull latest image
                     sudo docker pull ${IMAGE_NAME}:latest
 
-                    # Stop and cleanup existing container
+                    # Stop and cleanup
                     sudo docker stop devops-app || true
                     sudo docker rm devops-app || true
 
                     # Run new container
-                    # Note: Using sudo and ensuring port mapping matches your app
                     sudo docker run -d --name devops-app -p 5000:5000 ${IMAGE_NAME}:latest
-                "
-                '''
+EOF
+                """
             }
         }
     }
-}
-}
+  }
+ }
 }
 
 
