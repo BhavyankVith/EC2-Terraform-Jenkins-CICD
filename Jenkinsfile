@@ -32,8 +32,6 @@ pipeline {
       }
     }
 
-}
-
     stage('Provision Infrastructure') {
       steps {
         sh 'terraform init'
@@ -48,6 +46,7 @@ stage('SSH Test') {
       sh 'ssh -v ec2-user@EC2_IP "hostname"'
     }
   }
+}
 stage('Deploy App on EC2') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'dd5363fb-0a87-45e1-8c1c-7ea77575b4e0', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -74,7 +73,7 @@ EOF
             }
         }
     }
-}
+  }
  }
 }
 
