@@ -43,8 +43,7 @@ pipeline {
 stage('SSH Test') {
   steps {
     sshagent(credentials: ['ec2-ssh-key-v2']) {
-      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'hostname'"
-      //sh 'ssh -v ec2-user@EC2_IP "hostname"'
+      sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_HOST} 'whoami'"
     }
   }
 }
@@ -68,11 +67,11 @@ stage('Deploy App on EC2') {
           sudo docker run -d --name devops-app -p 5000:5000 ${IMAGE_NAME}:latest
 EOF
         """
+          }
+        }
       }
     }
   }
-}
-}
 }
 
 

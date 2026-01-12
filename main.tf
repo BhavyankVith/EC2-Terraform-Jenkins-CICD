@@ -13,8 +13,8 @@ data "aws_ami" "amazon_linux" {
   }
 }
 resource "aws_key_pair" "devops_key" {
-  key_name   = "devops-key"
-  public_key = file("~/.ssh/devops-key.pub")
+  key_name   = "devops-ec2-key"
+  public_key = file("~/.ssh/devops-ec2-key.pub")
 }
 resource "aws_security_group" "web_sg" {
   name        = "allow_web_ssh"
